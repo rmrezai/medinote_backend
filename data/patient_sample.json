@@ -1,0 +1,18 @@
+{
+  "POC_glucose": [278, 315],
+  "active_meds": ["insulin glargine", "metoprolol"],
+  "meal_percent": [60, 40],
+  "labs": {
+    "Cr": 2.1,
+    "baseline_Cr": 0.9,
+    "K": 6.2,
+    "Na": 133
+  },
+  "vitals": {
+    "SBP": 85,
+    "RR": 26,
+    "AMS": true
+  },
+  "problems": ["bacteremia", "osteomyelitis"],
+  "ICD10": []
+}
