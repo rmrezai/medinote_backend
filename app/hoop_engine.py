@@ -23,6 +23,14 @@ def hoop_engine(data):
     if data.get("active_meds"):
         assessment_plan.append(f"Current medications: {', '.join(data['active_meds'])}.")
 
+    # Add meal intake summary
+    if data.get("meal_percent"):
+        meal_values = data["meal_percent"]
+        avg_intake = sum(meal_values) / len(meal_values)
+        assessment_plan.append(
+            f"Average meal intake: {avg_intake:.1f}% of meals consumed."
+        )
+
     # Add POC glucose
     if data.get("POC_glucose"):
         glucose_values = ", ".join(str(g) for g in data["POC_glucose"])
