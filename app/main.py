@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from app.hoop_engine import hoop_engine
+from typing import List, Optional
+
+from app.hoop_engine import mediNote_hoop_engine as hoop_engine
 
 app = FastAPI()
 
@@ -9,13 +11,21 @@ def read_root():
     return {"message": "MediNote API is live 🚀"}
 
 class PatientData(BaseModel):
-    POC_glucose: list = []
-    active_meds: list = []
-    meal_percent: list = []
-    labs: dict = {}
-    vitals: dict = {}
-    problems: list = []
-    ICD10: list = []
+    baseline_Cr: Optional[float] = None
+    Cr: Optional[float] = None
+    eGFR: Optional[float] = None
+    MAP: Optional[float] = None
+    RR: Optional[float] = None
+    WBC: Optional[float] = None
+    SpO2: List[float] = []
+    O2_flow: Optional[str] = None
+    CXR_date: Optional[str] = None
+    Mg: Optional[float] = None
+    glucose: List[float] = []
+    HbA1c: Optional[float] = None
+
+    class Config:
+        extra = "allow"
 
 @app.post("/generate-note")
 async def generate_note(data: PatientData):
