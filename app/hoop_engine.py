@@ -28,6 +28,18 @@ def hoop_engine(data):
         glucose_values = ", ".join(str(g) for g in data["POC_glucose"])
         assessment_plan.append(f"POC Glucose readings: {glucose_values} mg/dL.")
 
+    # Add meal intake percentages
+    if data.get("meal_percent"):
+        meal_percent = data["meal_percent"]
+        if isinstance(meal_percent, (list, tuple)) and meal_percent:
+            avg_meal = sum(meal_percent) / len(meal_percent)
+            meal_summary = ", ".join(f"{p}%" for p in meal_percent)
+            assessment_plan.append(
+                f"Meal intake: {meal_summary} (average {avg_meal:.1f}%)."
+            )
+        else:
+            assessment_plan.append(f"Meal intake: {meal_percent}%.")
+
     # Generic plan
     assessment_plan.append("Plan: Continue current management, encourage healthy diet and exercise, follow up in 3 months.")
 
