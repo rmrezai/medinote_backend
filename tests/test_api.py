@@ -1,16 +1,7 @@
 import json
-import sys
 from pathlib import Path
 
-from fastapi.testclient import TestClient
-
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.append(str(ROOT))
-
-from app.main import app
-
-client = TestClient(app)
 
 
 def load_sample_data():
@@ -19,7 +10,13 @@ def load_sample_data():
         return json.load(f)
 
 
-def test_generate_note_returns_expected_strings():
+def test_read_root(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "MediNote API is live 🚀"}
+
+
+def test_generate_note_returns_expected_strings(client):
     data = load_sample_data()
     response = client.post("/generate-note", json=data)
     assert response.status_code == 200
@@ -28,3 +25,11 @@ def test_generate_note_returns_expected_strings():
     assert any("bacteremia" in item for item in plan)
     assert any("insulin glargine" in item for item in plan)
     assert any("POC Glucose readings" in item for item in plan)
+
+
+def test_generate_note_with_minimal_data(client):
+    response = client.post("/generate-note", json={})
+    assert response.status_code == 200
+    assert response.json()["assessment_plan"] == [
+        "Plan: Continue current management, encourage healthy diet and exercise, follow up in 3 months."
+    ]
