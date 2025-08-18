@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MediNote Patient Form</title>
+  <style>
+    .error { border-color: red; }
+    .error-message { color: red; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <form id="patient-form">
+    <div>
+      <label for="name">Name</label>
+      <input type="text" id="name" />
+      <span id="nameError" class="error-message"></span>
+    </div>
+    <div>
+      <label for="age">Age</label>
+      <input type="number" id="age" />
+      <span id="ageError" class="error-message"></span>
+    </div>
+    <div>
+      <label for="email">Email</label>
+      <input type="email" id="email" />
+      <span id="emailError" class="error-message"></span>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+  <div id="serverError" class="error-message"></div>
+  <script src="https://cdn.jsdelivr.net/npm/yup@1.2.0/dist/yup.min.js"></script>
+  <script src="form.js"></script>
+</body>
+</html>
