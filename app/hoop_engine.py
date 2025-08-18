@@ -1,38 +1,91 @@
-def hoop_engine(data):
+"""Utilities for generating a patient assessment and plan."""
+
+from typing import Any, Callable, Dict, Iterable, List, Optional
+
+
+def format_problems(problems: Iterable[str]) -> str:
+    """Return a sentence summarizing the patient's problems."""
+
+    return f"Patient presents with: {', '.join(problems)}."
+
+
+def format_labs(labs: Dict[str, Any]) -> str:
+    """Return a sentence summarizing recent laboratory values."""
+
+    summary = ", ".join(f"{k}: {v}" for k, v in labs.items())
+    return f"Recent labs: {summary}."
+
+
+def format_vitals(vitals: Dict[str, Any]) -> str:
+    """Return a sentence summarizing current vital signs."""
+
+    summary = ", ".join(f"{k}: {v}" for k, v in vitals.items())
+    return f"Vitals: {summary}."
+
+
+def format_meds(meds: Iterable[str]) -> str:
+    """Return a sentence summarizing active medications."""
+
+    return f"Current medications: {', '.join(meds)}."
+
+
+def format_poc_glucose(readings: Iterable[Any]) -> str:
+    """Return a sentence summarizing point-of-care glucose readings."""
+
+    values = ", ".join(str(g) for g in readings)
+    return f"POC Glucose readings: {values} mg/dL."
+
+
+DEFAULT_PLAN = [
+    "Plan: Continue current management, encourage healthy diet and exercise, follow up in 3 months."
+]
+
+
+def hoop_engine(
+    data: Dict[str, Any],
+    include_sections: Optional[Iterable[str]] = None,
+    plan: Optional[Iterable[str]] = None,
+) -> Dict[str, Any]:
+    """Generate an assessment and plan from patient data.
+
+    Parameters
+    ----------
+    data:
+        Patient data dictionary. Keys correspond to available sections such as
+        ``problems``, ``labs``, ``vitals``, ``active_meds`` and ``POC_glucose``.
+    include_sections:
+        Iterable of section names to include. If ``None`` (default), all
+        available sections present in ``data`` are used.
+    plan:
+        Iterable of plan strings to append to the assessment. If ``None``
+        (default), a generic plan is used.
+
+    Returns
+    -------
+    dict
+        The input ``data`` with an added ``assessment_plan`` list.
     """
-    Takes patient data and returns an assessment & plan.
-    """
 
-    assessment_plan = []
+    assessment_plan: List[str] = []
 
-    # Add problems
-    if data.get("problems"):
-        assessment_plan.append(f"Patient presents with: {', '.join(data['problems'])}.")
-
-    # Add labs
-    if data.get("labs"):
-        labs_summary = ", ".join(f"{k}: {v}" for k, v in data["labs"].items())
-        assessment_plan.append(f"Recent labs: {labs_summary}.")
-
-    # Add vitals
-    if data.get("vitals"):
-        vitals_summary = ", ".join(f"{k}: {v}" for k, v in data["vitals"].items())
-        assessment_plan.append(f"Vitals: {vitals_summary}.")
-
-    # Add meds
-    if data.get("active_meds"):
-        assessment_plan.append(f"Current medications: {', '.join(data['active_meds'])}.")
-
-    # Add POC glucose
-    if data.get("POC_glucose"):
-        glucose_values = ", ".join(str(g) for g in data["POC_glucose"])
-        assessment_plan.append(f"POC Glucose readings: {glucose_values} mg/dL.")
-
-    # Generic plan
-    assessment_plan.append("Plan: Continue current management, encourage healthy diet and exercise, follow up in 3 months.")
-
-    return {
-        **data,
-        "assessment_plan": assessment_plan
+    section_formatters: Dict[str, Callable[[Any], str]] = {
+        "problems": format_problems,
+        "labs": format_labs,
+        "vitals": format_vitals,
+        "active_meds": format_meds,
+        "POC_glucose": format_poc_glucose,
     }
+
+    sections_to_include = (
+        set(include_sections) if include_sections is not None else section_formatters.keys()
+    )
+
+    for section, formatter in section_formatters.items():
+        if section in sections_to_include and data.get(section):
+            assessment_plan.append(formatter(data[section]))
+
+    plan_items = list(plan) if plan is not None else DEFAULT_PLAN
+    assessment_plan.extend(plan_items)
+
+    return {**data, "assessment_plan": assessment_plan}
 
