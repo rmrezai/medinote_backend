@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>MediNote Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    textarea { width: 100%; box-sizing: border-box; padding: 1rem; font-family: monospace; }
+    #note { height: 200px; }
+  </style>
+</head>
+<body>
+  <h1>MediNote Generator</h1>
+  <form id="patient-form">
+    <label for="data">Patient Data (JSON)</label>
+    <textarea id="data" rows="8" placeholder='{"problems": ["hypertension"]}'></textarea>
+    <button type="submit">Submit</button>
+  </form>
+
+  <h2>Assessment &amp; Plan</h2>
+  <textarea id="note" readonly></textarea>
+  <button id="copy-btn">Copy to Clipboard</button>
+
+  <script>
+    document.getElementById('patient-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const text = document.getElementById('data').value;
+      let payload;
+      try {
+        payload = JSON.parse(text);
+      } catch (err) {
+        alert('Invalid JSON');
+        return;
+      }
+      const res = await fetch('/generate-note', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      const note = Array.isArray(json.assessment_plan) ? json.assessment_plan.join('\n') : '';
+      const noteEl = document.getElementById('note');
+      noteEl.value = note;
+    });
+
+    document.getElementById('copy-btn').addEventListener('click', async function() {
+      const noteEl = document.getElementById('note');
+      await navigator.clipboard.writeText(noteEl.value);
+    });
+  </script>
+</body>
+</html>
