@@ -23,3 +23,24 @@ def test_hoop_engine_generates_assessment_plan():
     assert any("bacteremia" in item for item in plan)
     assert any("Recent labs" in item for item in plan)
     assert any("POC Glucose readings" in item for item in plan)
+
+
+def test_hoop_engine_handles_missing_fields():
+    result = hoop_engine({})
+    assert result["assessment_plan"] == [
+        "Plan: Continue current management, encourage healthy diet and exercise, follow up in 3 months."
+    ]
+
+
+def test_hoop_engine_handles_empty_lists():
+    data = {
+        "problems": [],
+        "labs": {},
+        "vitals": {},
+        "active_meds": [],
+        "POC_glucose": [],
+    }
+    result = hoop_engine(data)
+    assert result["assessment_plan"] == [
+        "Plan: Continue current management, encourage healthy diet and exercise, follow up in 3 months."
+    ]
