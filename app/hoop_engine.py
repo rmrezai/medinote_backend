@@ -1,38 +1,23 @@
+"""Core engine for generating patient notes."""
+
+from .note_generator import generate_assessment_plan
+
+
 def hoop_engine(data):
+    """Create a response containing an assessment & plan.
+
+    Parameters
+    ----------
+    data:
+        Patient information to be fed to the note generator.
+
+    Returns
+    -------
+    dict
+        Original data augmented with ``assessment_plan`` key.
     """
-    Takes patient data and returns an assessment & plan.
-    """
 
-    assessment_plan = []
+    assessment_plan = generate_assessment_plan(data)
 
-    # Add problems
-    if data.get("problems"):
-        assessment_plan.append(f"Patient presents with: {', '.join(data['problems'])}.")
-
-    # Add labs
-    if data.get("labs"):
-        labs_summary = ", ".join(f"{k}: {v}" for k, v in data["labs"].items())
-        assessment_plan.append(f"Recent labs: {labs_summary}.")
-
-    # Add vitals
-    if data.get("vitals"):
-        vitals_summary = ", ".join(f"{k}: {v}" for k, v in data["vitals"].items())
-        assessment_plan.append(f"Vitals: {vitals_summary}.")
-
-    # Add meds
-    if data.get("active_meds"):
-        assessment_plan.append(f"Current medications: {', '.join(data['active_meds'])}.")
-
-    # Add POC glucose
-    if data.get("POC_glucose"):
-        glucose_values = ", ".join(str(g) for g in data["POC_glucose"])
-        assessment_plan.append(f"POC Glucose readings: {glucose_values} mg/dL.")
-
-    # Generic plan
-    assessment_plan.append("Plan: Continue current management, encourage healthy diet and exercise, follow up in 3 months.")
-
-    return {
-        **data,
-        "assessment_plan": assessment_plan
-    }
+    return {**data, "assessment_plan": assessment_plan}
 
